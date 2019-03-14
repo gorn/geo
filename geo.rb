@@ -55,7 +55,7 @@ class Location
     "<#{lat}, #{lon}>"
   end
 
-## technické metody
+  # technické metody
   # TODO: intialize a coerce používají obdobnou logiku
   def initialize(alat,alon)
     @lat = alat
@@ -77,3 +77,38 @@ class Location
     end
   end
 end
+
+class Tile
+  attr_accessor :zoom,:xnum,:ynum
+
+  def initialize(z, x, y)
+    @zoom = z.to_i
+    @xnum = x.to_i
+    @ynum = y.to_i
+  end
+  def lat_min; lat_calc(@ynum)   end 
+  def lat_max; lat_calc(@ynum+1) end 
+  def lon_min; lon_calc(@xnum)   end
+  def lon_max; lon_calc(@xnum+1) end
+    
+  def lat_range; (lat_min..lat_max) end
+  def lon_range; (lon_min..lon_max) end
+    
+  def left_bottom_corner # bottom left corner of the tile
+    Location.new(lat_min,lon_min)  
+  end
+  
+  private
+  
+  def lat_calc(ynum)
+    n = 2.0 ** @zoom
+    lat_rad = Math::atan(Math::sinh(Math::PI * (1 - 2 * ynum / n)))
+    180.0 * (lat_rad / Math::PI)
+  end
+  def lon_calc(xnum)
+    n = 2.0 ** @zoom
+    xnum / n * 360.0 - 180.0
+  end
+  
+end
+
